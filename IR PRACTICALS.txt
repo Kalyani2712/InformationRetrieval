@@ -1,0 +1,355 @@
+IR PRACTICALS :
+
+#PRACTICAL 1 : Bitwise operator 
+
+import pandas as pd
+from sklearn.feature_extraction.text import CountVectorizer
+corpus=['this is the first document.','this document is second document.',
+        'and this is the third one.','is this the first document?', ]
+vectorizer= CountVectorizer()
+X=vectorizer.fit_transform(corpus)
+print("fit transform is ")
+print(X.toarray())
+df=pd.DataFrame(X.toarray(),columns=vectorizer.get_feature_names_out())
+print("the generated data frame is")
+print(df)
+alldata= df[(df['this']==1)&(df['first']==1)]
+print("indices where 'this'and 'first'terms are present are ",alldata.index.tolist())
+ordata= df[(df['this']==1)|(df['first']==1)]
+print("indices where either of 'this'and 'first'terms are present are ",ordata.index.tolist())
+notdata=df[(df['and']!=1)]
+print("indices where 'and' term is not present ",notdata.index.tolist())
+
+
+#PRACTICAL 2 :  Unigram , bigram , trigram 
+
+import nltk
+from nltk import word_tokenize
+from nltk.util import ngrams
+text ="this is a sample text for unigram,bigram and trigram extraction using NLTK"
+print(text)
+token = word_tokenize(text.lower()) #tokenize text
+unigrams = list(ngrams(token ,1))
+print("\n Unigrams :", unigrams)
+bigrams = list(ngrams(token ,2))
+print("\n Bigrams :", bigrams)
+trigrams = list(ngrams(token ,3))
+print("\n Trigrams :", trigrams)
+
+#practical no :03  performanceofanIRmodelusingStandardEvalutionMetrics
+
+from sklearn.metrics import precision_score, recall_score , f1_score
+ground_truth = [1,0,1,0,1,1,0,0,1,1]
+print(" ground_truth:", ground_truth )
+predicted_relevance =[1,1,1,0,0,1,0,1,1,0]
+print("predicted_relevance :", predicted_relevance )
+precision = precision_score(ground_truth , predicted_relevance)
+print("precision :", precision )
+recall = recall_score(ground_truth , predicted_relevance)
+print("recall :", recall )
+f1_score = f1_score(ground_truth , predicted_relevance)
+print("f1_score :" ,f1_score )
+
+#Practical no  : 04 CosineSimilarity
+
+import numpy as np
+import pandas as pd
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
+
+def cosine_similarity(x,y):
+    if len(x)!=len(y):
+        return None
+    dot_product=np.dot(x,y)
+    print("dot product is  of goven x and y:",{dot_product})
+    magnitude_x=np.sqrt(np.sum(x**2))
+    print("Magnitude of x :",magnitude_x)
+    magnitude_y=np.sqrt(np.sum(y**2))
+    print("Magnitude of y :",magnitude_y)
+    cosine_similarity=dot_product/(magnitude_x * magnitude_y)
+    return cosine_similarity
+corpus=['data science is one of the most importannt field of science',
+        'this is one of the best data science courses',
+        'data Scientists analuse data ']
+x=CountVectorizer().fit_transform(corpus).toarray()
+print(x)
+cos_sim1_2= cosine_similarity(x[0,:],x[1,:])
+cos_sim1_3= cosine_similarity(x[0,:],x[2,:])
+cos_sim2_3= cosine_similarity(x[1,:],x[2,:])
+
+print("cosinie Similarities :")
+print('\t Document1 and 2 :',cos_sim1_2)
+print('\t Document1 and 3 :',cos_sim1_3)
+print('\t Document2 and 3 :',cos_sim2_3)
+
+#Practical no : 05  TextClusteringWith K-means And TF-IDF
+
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.cluster import KMeans
+from sklearn.metrics import silhouette_score
+
+docs = [
+    "some land is hill", "some mammals are flurry", "cats are the mammals",
+    "mountains are some land", "people are humans", "humans are good persons"
+]
+
+tfidf = TfidfVectorizer(stop_words="english").fit_transform(docs)
+kmeans = KMeans(n_clusters=3, random_state=42, n_init=10).fit(tfidf)
+
+for i, doc in enumerate(docs):
+    print(f"Doc {i+1}: {doc} → Cluster {kmeans.labels_[i]}")
+
+print(f"Silhouette Score: {silhouette_score(tfidf, kmeans.labels_):.3f}")
+
+
+#Practical no : 06  pre processing of text document :stop word removal
+
+from nltk.corpus import stopwords
+from nltk.tokenize import word_tokenize
+
+example_sent="We are the students of computer science from Ckt College"
+stop_words=set(stopwords.words('english'))
+word_tokens=word_tokenize(example_sent)
+filtered_sentence=[w for w in word_tokens if not w in stop_words]
+print(" word token :",word_tokens)
+print("filtered Sentence :",filtered_sentence)
+
+
+#Practical no : 07 Summarization
+
+#pip install torch
+#pip install transformers
+from transformers import pipeline
+summarizer = pipeline("summarization", model="facebook/bart-large-cnn")
+text = """
+Quantum computing is one of the most exciting fields of modern technology. It aims to use the principles of quantum mechanics 
+to perform calculations at speeds far beyond those of traditional computers. While classical computers rely on binary bits 
+(0s and 1s), quantum computers use quantum bits, or qubits, which can exist in multiple states simultaneously, thanks to 
+superposition. This property, combined with quantum entanglement, allows quantum computers to solve certain problems exponentially 
+faster than their classical counterparts. However, the development of quantum computing is still in its early stages, and significant 
+technical challenges remain, such as error correction and qubit coherence. Despite these hurdles, the potential applications of 
+quantum computing in areas like cryptography, drug discovery, and optimization are vast, and researchers are optimistic about its future.
+"""
+summary = summarizer(text, max_length=100, min_length=50, do_sample=False)
+print("Summarization Model Used:", summarizer.model.name_or_path)
+print("\nSummary of the Text:")
+print(summary[0]['summary_text'])
+
+#Practical no : 08 Question Answering 
+
+#pip install torch
+#pip install transformers
+from transformers import pipeline
+# Specify the Question Answering model explicitly
+qa = pipeline("question-answering", model="deepset/roberta-base-squad2")
+
+text = """
+Quantum computing is one of the most exciting fields of modern technology. It aims to use the principles of quantum mechanics 
+to perform calculations at speeds far beyond those of traditional computers. While classical computers rely on binary bits 
+(0s and 1s), quantum computers use quantum bits, or qubits, which can exist in multiple states simultaneously, thanks to 
+superposition. This property, combined with quantum entanglement, allows quantum computers to solve certain problems exponentially 
+faster than their classical counterparts. However, the development of quantum computing is still in its early stages, and significant 
+technical challenges remain, such as error correction and qubit coherence. Despite these hurdles, the potential applications of 
+quantum computing in areas like cryptography, drug discovery, and optimization are vast, and researchers are optimistic about its future.
+"""
+question1 = "What is quantum computing?"
+question2 = "What are the potential applications of quantum computing?"
+question3 = "What challenges does quantum computing face?"
+
+answer1 = qa(question=question1, context=text)
+answer2 = qa(question=question2, context=text)
+answer3 = qa(question=question3, context=text)
+
+print("Question Answering Model Used:", qa.model.name_or_path)
+print("\nQuestion 1:", question1)
+print("Answer:", answer1['answer'])
+print("\nQuestion 2:", question2)
+print("Answer:", answer2['answer'])
+print("\nQuestion 3:", question3)
+print("Answer:", answer3['answer'])
+
+#Practical no : 09 Dynamic  ProgrammingAlgoforComputingEditDistance for string s1 and s2 
+
+import numpy as np
+def Levenshtein(s1, s2):
+    if s1 == "":
+        return len(s2)
+    if s2 == "":
+        return len(s1)
+    if s1[-1] == s2[-1]:
+        cost = 0
+    else:
+        cost = 1 
+    res = min([Levenshtein(s1[:-1], s2)+1,
+               Levenshtein(s1, s2[:-1])+1, 
+               Levenshtein(s1[:-1], s2[:-1]) + cost])
+    return res
+print(Levenshtein("execution", "intention"))
+
+#Practical no : 10 Simple web crawler
+
+import requests
+from bs4 import BeautifulSoup
+from urllib.parse import urljoin  
+
+base_url = "https://www.Amazon.in"
+visited, queue = set(), [base_url]  
+
+while queue:
+    url = queue.pop(0)
+    if url in visited:
+        continue
+
+    print(f"Crawling: {url}")
+    visited.add(url)
+
+    try:
+        soup = BeautifulSoup(requests.get(url).content, "html.parser")
+        queue.extend(urljoin(url, a["href"]) for a in soup.find_all("a", href=True))
+    except requests.RequestException as e:
+        print(f"Error: {e}")
+
+print("Crawling finished.")
+
+#Practical no 11   simple web scraping process using Python within the  Spyder environment
+
+import requests 
+from bs4 import BeautifulSoup 
+
+url = 'https://google.com' 
+response = requests.get(url) 
+if response.status_code == 200: 
+ soup = BeautifulSoup(response.text, 'html.parser') 
+ text_content = soup.get_text() 
+ print(text_content) 
+else: 
+ print(f"Error: Unable to fetch content. Status code: {response.status_code}") 
+
+
+#PRACTCAL NO : 12 
+
+1. movies.xml
+<collection shelf="New Arrivals">
+<movie title="Enemy Behind">
+   <type>War, Thriller</type>
+   <format>DVD</format>
+   <year>2003</year>
+   <rating>PG</rating>
+   <stars>10</stars>
+   <description>Talk about a US-Japan war</description>
+</movie>
+<movie title="Transformers">
+   <type>Anime, Science Fiction</type>
+   <format>DVD</format>
+   <year>1989</year>
+   <rating>R</rating>
+   <stars>8</stars>
+   <description>A schientific fiction</description>
+</movie>
+   <movie title="Trigun">
+   <type>Anime, Action</type>
+   <format>DVD</format>
+   <episodes>4</episodes>
+   <rating>PG</rating>
+   <stars>10</stars>
+   <description>Vash the Stampede!</description>
+</movie>
+<movie title="Ishtar">
+   <type>Comedy</type>
+   <format>VHS</format>
+   <rating>PG</rating>
+   <stars>2</stars>
+   <description>Viewable boredom</description>
+</movie>
+</collection>
+
+2. Web graph and compute topic specific page rank. (.py file)
+
+import networkx as nx
+import matplotlib.pyplot as plt
+from xml.dom.minidom import parse
+
+# Parse XML
+collection = parse("movies.xml").documentElement
+if collection.hasAttribute("shelf"):
+    print("Root element:", collection.getAttribute("shelf"))
+
+# Print movie details
+for movie in collection.getElementsByTagName("movie"):
+    print("\n***** Movie *****")
+    print("Title:", movie.getAttribute("title")) if movie.hasAttribute("title") else None
+    for tag in ["type", "format", "rating", "description"]:
+        print(f"{tag.capitalize()}: {movie.getElementsByTagName(tag)[0].childNodes[0].data}")
+
+# Generate and visualize graph
+def GenerateGraph():
+    G = nx.Graph([("a", "b"), ("b", "c"), ("c", "d"), ("d", "a"), ("a", "c")])
+    nx.draw(G, with_labels=True, node_color='lightblue', edge_color='gray', node_size=2000, font_size=15)
+    plt.savefig("simple_path.png")  
+    plt.show()
+    print("Nodes:", G.nodes(), "\nEdges:", G.edges())
+
+GenerateGraph()
+
+ 
+
+#PRACTCAL NO : 13 Hubs and Authorities
+
+import networkx as nx
+G = nx.DiGraph()
+G.add_edges_from([(1, 2), (1, 3), (2, 3), (3, 1)])
+pagerank_scores = nx.pagerank(G)
+hits_scores = nx.hits(G)
+print("PageRank Scores:", pagerank_scores)
+print("Hub Scores:", hits_scores[0])
+print("Authority Scores:", hits_scores[1])
+
+#PRACTCAL NO : 14  
+
+import nltk
+import gensim
+import numpy as np
+from nltk.tokenize import word_tokenize
+from sklearn.metrics.pairwise import cosine_similarity
+
+nltk.download("punkt")
+docs = [
+    "Information retrieval is a key area in search engines.",
+    "Machine learning helps improve search relevance.",
+    "Deep learning and AI are advancing information retrieval.",
+    "Search engines use algorithms to rank results.",
+    "Artificial intelligence enhances text processing."
+]
+tokenized_docs = [word_tokenize(doc.lower()) for doc in docs]
+model = gensim.models.Word2Vec(tokenized_docs, vector_size=100, window=5, min_count=1, workers=4)
+def get_vector(sentence):
+    vectors = [model.wv[w] for w in word_tokenize(sentence.lower()) if w in model.wv]
+    return np.mean(vectors, axis=0) if vectors else np.zeros(model.vector_size)
+def search(query):
+    query_vec, doc_vecs = get_vector(query), np.array([get_vector(doc) for doc in docs])
+    scores = cosine_similarity([query_vec], doc_vecs)[0]
+    ranked = sorted(zip(docs, scores), key=lambda x: x[1], reverse=True)
+    
+    print(f"\nSearch Results for: {query}")
+    for doc, score in ranked:
+        print(f"Score: {score:.4f} | {doc}" if score > 0 else "No relevant results.")
+search(input("Enter search query: "))
+
+#PRACTCAL NO : 15  
+
+import numpy as np 
+def pagerank(G, beta=0.85, tol=1e-6, max_iter=100):  
+    n = len(G)  
+    M = np.where(G.sum(axis=1, keepdims=True) == 0, 1/n, G / G.sum(axis=1, keepdims=True))  
+    A = beta * M + (1 - beta) / n  
+    R = np.ones(n) / n  
+    for _ in range(max_iter):  
+        new_R = A @ R  
+        if np.linalg.norm(new_R - R, 1) < tol: break  
+        R = new_R  
+
+    return np.round(R, 5)  
+G = np.array([[0, 1, 1], [1, 0, 1], [0, 1, 0]])  
+print("Final PageRank Scores:", pagerank(G))
+
+
